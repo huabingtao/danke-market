@@ -1,0 +1,5 @@
+{
+  "port": 8003,
+  "adminPassword": "admin_change_me",
+  "timezone": "Asia/Shanghai"
+}

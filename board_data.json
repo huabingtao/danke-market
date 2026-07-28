@@ -1,0 +1,32 @@
+{
+  "egg": [
+    {
+      "itemId": "1783656181373_w29hlci",
+      "id": "3243434534",
+      "price": 2339,
+      "online": true,
+      "ownerId": "client_1783656179456_crcqssq"
+    }
+  ],
+  "milk": [],
+  "goose": [
+    {
+      "itemId": "1783656190288_xdchf47",
+      "id": "234234445",
+      "price": 234234,
+      "online": true,
+      "ownerId": "client_1783656179456_crcqssq"
+    }
+  ],
+  "honey": [],
+  "wool": [
+    {
+      "itemId": "1783656209769_5cebo4u",
+      "id": "2342346634",
+      "price": 66666663,
+      "online": true,
+      "ownerId": "client_1783656179456_crcqssq"
+    }
+  ],
+  "feather": []
+}

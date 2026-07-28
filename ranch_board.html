@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢乐牧场 - 卖菜价格直播看板</title>
+    <!-- 引入 Outfit 现代英文字体与系统字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(15, 23, 42, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-gold: #d97706;
+            --gradient-accent: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --egg-color: #ef4444;
+            --milk-color: #2563eb;
+            --goose-color: #7c3aed;
+            --honey-color: #ca8a04;
+            --wool-color: #059669;
+            --feather-color: #db2777;
+
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --input-border: rgba(15, 23, 42, 0.1);
+            --input-color: #0f172a;
+            --row-bg: rgba(15, 23, 42, 0.01);
+            --row-border: rgba(15, 23, 42, 0.03);
+            --row-hover: rgba(15, 23, 42, 0.03);
+            --row-focus-border: rgba(217, 119, 6, 0.25);
+            --badge-bg: rgba(15, 23, 42, 0.05);
+            --badge-color: #475569;
+            --btn-add-bg: rgba(15, 23, 42, 0.01);
+            --btn-add-border: rgba(15, 23, 42, 0.08);
+            --btn-add-hover-bg: rgba(15, 23, 42, 0.04);
+            --btn-add-hover-border: rgba(15, 23, 42, 0.15);
+            --control-bg: rgba(255, 255, 255, 0.9);
+            --control-border: rgba(15, 23, 42, 0.08);
+            --control-btn-bg: rgba(15, 23, 42, 0.04);
+            --control-btn-border: rgba(15, 23, 42, 0.08);
+            --control-btn-color: #0f172a;
+            --control-btn-hover-bg: rgba(15, 23, 42, 0.08);
+        }
+
+        html {
+            font-size: 100%;
+            /* 手机端默认大小，保持紧凑 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(245, 158, 11, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(147, 197, 253, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            padding: 6px 8px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 12px 0 6px 0;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-bottom: 130px;
+        }
+
+        /* 两列网格，占满可用屏幕宽度 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 极致紧凑卡片，占满列宽 */
+        .crop-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px 8px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .crop-card:hover {
+            border-color: rgba(15, 23, 42, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            padding-bottom: 3px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+        }
+
+        .crop-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .crop-badge {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            box-shadow: 0 0 5px currentColor;
+        }
+
+        .crop-name {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .price-range {
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+            background: rgba(15, 23, 42, 0.03);
+            padding: 0px 3px;
+            border-radius: 3px;
+        }
+
+        /* 数据行 */
+        .id-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .id-row {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--row-bg);
+            border: 1px solid var(--row-border);
+            border-radius: 6px;
+            padding: 2px 3px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .id-row:hover,
+        .id-row:focus-within {
+            background: var(--row-hover);
+            border-color: var(--row-focus-border);
+        }
+
+        .rank-badge {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--badge-bg);
+            color: var(--badge-color);
+            font-size: 0.6rem;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .id-row.is-offline {
+            opacity: 0.55;
+        }
+
+        .btn-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            user-select: none;
+            outline: none;
+        }
+
+        .status-online {
+            background-color: #10b981;
+            box-shadow: 0 0 4px rgba(16, 185, 129, 0.6);
+        }
+
+        .status-online:hover {
+            transform: scale(1.2);
+        }
+
+        .status-offline {
+            background-color: #94a3b8;
+        }
+
+        .status-offline:hover {
+            transform: scale(1.2);
+        }
+
+        .status-text {
+            display: none;
+        }
+
+        .id-row.rank-1 .rank-badge {
+            background: #f59e0b;
+            color: #fff;
+            box-shadow: 0 0 5px rgba(245, 158, 11, 0.4);
+        }
+
+        .id-row.rank-2 .rank-badge {
+            background: #9ca3af;
+            color: #fff;
+        }
+
+        .id-row.rank-3 .rank-badge {
+            background: #b45309;
+            color: #fff;
+        }
+
+        .input-group {
+            display: flex;
+            flex: 1;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        input {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            color: var(--input-color);
+            font-size: 0.72rem;
+            padding: 2px 4px;
+            transition: border-color 0.15s;
+            min-width: 0;
+            width: 100%;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .input-id {
+            flex: 1;
+            font-weight: 500;
+            min-width: 0;
+        }
+
+        .input-price {
+            width: 38px;
+            /* 缩短价格框宽度 */
+            text-align: center;
+            font-weight: 800;
+            color: var(--accent-gold);
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
+        /* 增删按钮 */
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 1px;
+            transition: opacity 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete:hover {
+            opacity: 1;
+        }
+
+        .btn-add {
+            width: 100%;
+            background: var(--btn-add-bg);
+            border: 1px dashed var(--btn-add-border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-top: auto;
+        }
+
+        .btn-add:hover {
+            background: var(--btn-add-hover-bg);
+            color: var(--text-primary);
+            border-color: var(--btn-add-hover-border);
+        }
+
+        .btn-add:active {
+            transform: scale(0.97);
+        }
+
+        /* 新增行进入动画效果 */
+        @keyframes rowSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .row-new {
+            animation: rowSlideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* 底部控制台 */
+        .control-bar {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 16px);
+            max-width: 420px;
+            background: var(--control-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--control-border);
+            border-radius: 12px;
+            padding: 6px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+        }
+
+        .control-btn {
+            flex: 1;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .btn-sort {
+            background: var(--gradient-accent);
+            color: #fff;
+            /* 白字高对比 */
+        }
+
+        .btn-sort:hover {
+            opacity: 0.9;
+        }
+
+        .btn-copy {
+            background: var(--control-btn-bg);
+            color: var(--control-btn-color);
+            border: 1px solid var(--control-btn-border);
+        }
+
+        .btn-copy:hover {
+            background: var(--control-btn-hover-bg);
+        }
+
+        .btn-clear {
+            background: rgba(239, 68, 68, 0.06);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            flex: 1;
+        }
+
+        .btn-clear:hover {
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        /* 成功提示气泡 */
+        .toast {
+            position: fixed;
+            top: 16px;
+            background: #10b981;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 顶部提示栏样式 */
+        .tips-banner {
+            background: rgba(217, 119, 6, 0.08);
+            border: 1px solid rgba(217, 119, 6, 0.15);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.72rem;
+            color: #b45309;
+            /* 更加清晰的深黄褐色 */
+            text-align: center;
+            margin-bottom: 12px;
+            max-width: 100%;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
+
+        /* 二维码展示区域样式 */
+        .qr-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.02);
+            border: 1px solid rgba(15, 23, 42, 0.04);
+            border-radius: 12px;
+            padding: 8px 10px;
+            margin-top: 14px;
+            max-width: 100%;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .qr-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qr-item img {
+            width: 100%;
+            max-width: 84px;
+            height: 84px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #fff;
+            padding: 2px;
+        }
+
+        .qr-item span {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* 个人微信号展示框样式 */
+        .wechat-id-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.02);
+            border: 1px solid rgba(15, 23, 42, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+            height: 84px;
+            /* 与二维码图片高度保持一致 */
+        }
+
+        .wechat-id-box:hover {
+            background: rgba(15, 23, 42, 0.05);
+            border-color: rgba(217, 119, 6, 0.3);
+        }
+
+        .wechat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .wechat-val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+
+        /* 手机端 SVG 尺寸限制 */
+        .btn-delete svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        .btn-add svg {
+            width: 8px;
+            height: 8px;
+        }
+
+        .control-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* 仅在 iPad / PC 宽屏及大屏设备上进行字体与间距整体放大一倍，保证大屏的可读性与美观 */
+        @media (min-width: 768px) {
+            html {
+                font-size: 200%;
+            }
+
+            .crop-badge {
+                width: 12px;
+                height: 12px;
+            }
+
+            .id-row {
+                padding: 5px 6px;
+                gap: 4px;
+            }
+
+            .rank-badge {
+                display: flex;
+                width: 24px;
+                height: 24px;
+            }
+
+            .btn-status {
+                border: 1px solid currentColor;
+                border-radius: 0.2rem;
+                padding: 0.06rem 0.2rem;
+                font-size: 0.52rem;
+                width: auto;
+                height: auto;
+                line-height: 1.1;
+            }
+
+            .btn-status:hover {
+                transform: none;
+            }
+
+            .status-online {
+                background: rgba(16, 185, 129, 0.08);
+                border-color: rgba(16, 185, 129, 0.25);
+                color: #10b981;
+                box-shadow: none;
+            }
+
+            .status-online:hover {
+                background: rgba(16, 185, 129, 0.15);
+            }
+
+            .status-offline {
+                background: rgba(100, 116, 139, 0.08);
+                border-color: rgba(100, 116, 139, 0.25);
+                color: #64748b;
+                box-shadow: none;
+            }
+
+            .status-offline:hover {
+                background: rgba(100, 116, 139, 0.15);
+            }
+
+            .status-text {
+                display: inline;
+            }
+
+            input {
+                padding: 4px 6px;
+            }
+
+            .input-price {
+                width: 68px;
+            }
+
+            .btn-add {
+                padding: 8px;
+                gap: 5px;
+            }
+
+            .control-bar {
+                bottom: 12px;
+                max-width: 500px;
+                padding: 10px 14px;
+                gap: 8px;
+            }
+
+            .control-btn {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+
+            .tips-banner {
+                padding: 10px 14px;
+            }
+
+            .qr-section {
+                padding: 12px 16px;
+            }
+
+            /* SVG 尺寸适配 */
+            .btn-delete svg {
+                width: 16px !important;
+                height: 16px !important;
+            }
+
+            .btn-add svg {
+                width: 12px !important;
+                height: 12px !important;
+            }
+
+            .control-btn svg {
+                width: 18px !important;
+                height: 18px !important;
+            }
+        }
+
+        /* 自定义确认弹窗样式 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            /* 默认隐藏 */
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .confirm-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .confirm-content {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 0.8rem;
+            padding: 1.2rem;
+            width: 90%;
+            max-width: 18rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+            transform: scale(0.9);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .confirm-modal.show .confirm-content {
+            transform: scale(1);
+        }
+
+        .confirm-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #dc2626;
+            margin-bottom: 0.5rem;
+        }
+
+        .confirm-body {
+            font-size: 0.75rem;
+            color: #475569;
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: space-between;
+        }
+
+        .confirm-action-btn {
+            flex: 1;
+            border: none;
+            border-radius: 0.4rem;
+            padding: 0.5rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-modal-cancel {
+            background: rgba(15, 23, 42, 0.04);
+            color: #475569;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .btn-modal-cancel:hover {
+            background: rgba(15, 23, 42, 0.08);
+        }
+
+        .btn-modal-confirm {
+            background: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2);
+        }
+
+        .btn-modal-confirm:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🎮 欢乐牧场价格看板</h1>
+        <!-- <div class="subtitle">实时挂菜王ID及价格，六大动物一屏全览</div> -->
+    </header>
+
+    <main>
+        <!-- 温馨提示 banner -->
+        <div class="tips-banner">
+            💡 <b>温馨提示</b>：交易完的特工请自觉秒删，把机会留给其他人！
+        </div>
+
+        <!-- 动物卡片网格容器 -->
+        <div class="cards-grid" id="cards-grid" style="margin-top: 15px;">
+            <!-- 各分类卡片由 JavaScript 动态生成 -->
+        </div>
+
+        <!-- 二维码与联系方式模块 -->
+        <div class="qr-section">
+            <div class="qr-item">
+                <img src="弹壳呱呱公众号二维码.jpg" alt="公众号">
+                <span>关注公众号:弹壳呱呱</span>
+            </div>
+            <div class="wechat-id-box" onclick="copyWeChatId('alcl8586')" title="点击复制微信号">
+                <span class="wechat-label">💬 进卖菜群加绿泡泡</span>
+                <span class="wechat-val">alcl8586</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部控制栏 -->
+    <div class="control-bar">
+        <button class="control-btn btn-sort" onclick="sortAllCrops()">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" />
+            </svg>
+            一键排序
+        </button>
+        <button class="control-btn btn-copy" onclick="copyBoardText()">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+            </svg>
+            复制文案
+        </button>
+        <button class="control-btn btn-clear" onclick="clearAllData()">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg>
+            一键清空
+        </button>
+    </div>
+
+    <!-- 复制成功的通知浮点 -->
+    <div class="toast" id="toast">复制成功！快发去群里或评论区吧</div>
+
+    <!-- 自定义确认弹窗 Modal -->
+    <div class="confirm-modal" id="confirm-modal">
+        <div class="confirm-content">
+            <div class="confirm-title">⚠️ 确认清空</div>
+            <div class="confirm-body">确认要重置清空所有数据吗？此操作无法恢复。</div>
+            <div class="confirm-actions">
+                <button class="confirm-action-btn btn-modal-cancel" onclick="closeConfirmModal()">取消</button>
+                <button class="confirm-action-btn btn-modal-confirm" onclick="executeClearAll()">确认清空</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 六种动物的属性定义
+        const cropConfigs = {
+            egg: { name: '🍳 鸡蛋', range: '225 - 250', color: 'var(--egg-color)' },
+            milk: { name: '🥛 牛奶', range: '225 - 250', color: 'var(--milk-color)' },
+            goose: { name: '🪶 鹅绒', range: '675 - 750', color: 'var(--goose-color)' },
+            honey: { name: '🍯 蜂蜜', range: '675 - 750', color: 'var(--honey-color)' },
+            wool: { name: '🐑 羊毛', range: '2250 - 2500', color: 'var(--wool-color)' },
+            feather: { name: '🦚 翎羽', range: '6750 - 7500', color: 'var(--feather-color)' }
+        };
+
+        // 默认数据初始化
+        let boardData = {
+            egg: [
+                { id: '54386479', price: 225 }
+            ],
+            milk: [
+                { id: '19960793', price: 247 },
+                { id: '53839534', price: 244 }
+            ],
+            goose: [],
+            honey: [
+                { id: '24951786', price: 748 },
+                { id: '', price: 675 }
+            ],
+            wool: [
+                { id: '59143759', price: 2431 }
+            ],
+            feather: [
+                { id: "19960793", price: 7425 }
+            ]
+        };
+
+        const LOCAL_STORAGE_KEY = "danke_ranch_all_board_data_v4";
+
+        // 记录上一次本地编辑的时间戳，用于避开服务器的拉取覆盖
+        let lastEditTime = 0;
+
+        // 动态构建 API 基础路径，兼容 file:// 本地直接打开与 http:// 局域网服务访问
+        function getApiUrl(endpoint) {
+            if (window.location.protocol === "file:") {
+                // 如果是电脑本地 file:// 直接双击打开，强制指向本地 8080 端口的服务
+                return `http://localhost:8080${endpoint}`;
+            }
+            return endpoint;
+        }
+
+        // 定时从服务端加载最新同步数据
+        async function loadFromServer() {
+            // 如果距离上一次本地编辑不足 4 秒，则跳过拉取同步，防止用旧数据覆盖本地正在输入的最新数据
+            if (Date.now() - lastEditTime < 4000) {
+                return;
+            }
+            try {
+                const res = await fetch(getApiUrl("/api/load"));
+                const data = await res.json();
+                if (data && typeof data === "object") {
+                    // 更新并重渲染
+                    boardData = data;
+                    renderAllCards();
+                }
+            } catch (e) {
+                console.warn("Failed to sync from server:", e);
+            }
+        }
+
+        // 初始化
+        window.addEventListener("DOMContentLoaded", async () => {
+            loadFromLocalStorage();
+            renderAllCards();
+
+            // 首屏同步一次
+            await loadFromServer();
+
+            // 每隔 3 秒自动拉取一次服务器数据，实现双端（PC/手机）实时同步
+            setInterval(loadFromServer, 3000);
+        });
+
+        // 渲染页面上的所有分类卡片
+        function renderAllCards() {
+            const gridContainer = document.getElementById("cards-grid");
+            gridContainer.innerHTML = "";
+
+            for (const cropKey in cropConfigs) {
+                const config = cropConfigs[cropKey];
+                const items = boardData[cropKey] || [];
+
+                const card = document.createElement("div");
+                card.className = "crop-card";
+                card.id = `card-${cropKey}`;
+
+                // 生成行数据 HTML
+                let rowsHtml = "";
+                if (items.length === 0) {
+                    rowsHtml = `
+                        <div style="text-align: center; color: var(--text-secondary); padding: 8px 0; font-size: 0.62rem;">
+                            暂无数据
+                        </div>
+                    `;
+                } else {
+                    items.forEach((item, index) => {
+                        const isOnline = item.hasOwnProperty("online") ? item.online : true;
+                        const statusClass = isOnline ? "status-online" : "status-offline";
+                        const offlineClass = isOnline ? "" : "is-offline";
+                        const statusText = isOnline ? "在线" : "下线";
+                        const newClass = item.isNew ? "row-new" : "";
+                        if (item.isNew) {
+                            delete item.isNew;
+                        }
+                        rowsHtml += `
+                            <div class="id-row rank-${index + 1} ${offlineClass} ${newClass}">
+                                <div class="rank-badge">${index + 1}</div>
+                                <button class="btn-status ${statusClass}" onclick="toggleOnline('${cropKey}', ${index})" title="切换在线状态">
+                                    <span class="status-text">${statusText}</span>
+                                </button>
+                                <div class="input-group">
+                                    <input type="text" class="input-id" placeholder="ID/备注" value="${item.id}" oninput="updateItem('${cropKey}', ${index}, 'id', this.value)">
+                                    <input type="number" class="input-price" placeholder="价格" value="${item.price}" oninput="updateItem('${cropKey}', ${index}, 'price', this.value)">
+                                </div>
+                                <button class="btn-delete" onclick="deleteRow('${cropKey}', ${index})" title="删除">
+                                    <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="crop-title-wrapper">
+                            <span class="crop-badge" style="color: ${config.color}; background-color: ${config.color};"></span>
+                            <span class="crop-name">${config.name}</span>
+                        </div>
+                        <div class="price-range">最高价: ${config.range.split(" - ")[1]}</div>
+                    </div>
+                    <div class="id-list" id="list-${cropKey}">
+                        ${rowsHtml}
+                    </div>
+                    <button class="btn-add" onclick="addNewRow('${cropKey}')">
+                        <svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        添加
+                    </button>
+                `;
+                gridContainer.appendChild(card);
+            }
+        }
+
+        // 修改项目数据
+        function updateItem(cropKey, index, key, value) {
+            lastEditTime = Date.now(); // 记录本次编辑时间
+            if (key === "price") {
+                boardData[cropKey][index][key] = parseFloat(value) || 0;
+            } else {
+                boardData[cropKey][index][key] = value;
+            }
+            saveToLocalStorage();
+        }
+
+        // 添加新数据行
+        function addNewRow(cropKey) {
+            lastEditTime = Date.now(); // 记录本次编辑时间
+            if (!boardData[cropKey]) {
+                boardData[cropKey] = [];
+            }
+            const config = cropConfigs[cropKey];
+            const defaultPrice = parseInt(config.range.split(" - ")[0]) || 0;
+            boardData[cropKey].push({ id: "", price: defaultPrice, online: true, isNew: true });
+            saveToLocalStorage();
+            renderAllCards();
+            // 自动聚焦
+            setTimeout(() => {
+                const card = document.getElementById(`card-${cropKey}`);
+                if (card) {
+                    const inputs = card.querySelectorAll(".input-id");
+                    if (inputs.length > 0) {
+                        inputs[inputs.length - 1].focus();
+                    }
+                }
+            }, 50);
+        }
+
+        // 删除单行数据
+        function deleteRow(cropKey, index) {
+            lastEditTime = Date.now(); // 记录本次编辑时间
+            boardData[cropKey].splice(index, 1);
+            saveToLocalStorage();
+            renderAllCards();
+        }
+
+        // 一键把所有分类的价格按在线优先、价格由高到低重新排序
+        function sortAllCrops() {
+            lastEditTime = Date.now(); // 记录本次编辑时间
+            for (const cropKey in boardData) {
+                boardData[cropKey].sort((a, b) => {
+                    const aOnline = a.hasOwnProperty("online") ? a.online : true;
+                    const bOnline = b.hasOwnProperty("online") ? b.online : true;
+                    if (aOnline !== bOnline) {
+                        return aOnline ? -1 : 1;
+                    }
+                    return b.price - a.price;
+                });
+            }
+            saveToLocalStorage();
+            renderAllCards();
+            showToast("已按“在线优先、价格从高到低”完成降序！");
+        }
+
+        // 从本地存储加载数据
+        function loadFromLocalStorage() {
+            const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (localData) {
+                try {
+                    boardData = JSON.parse(localData);
+                } catch (e) {
+                    console.error("Failed to parse local storage data, using default.", e);
+                }
+            }
+        }
+
+        // 保存数据到本地存储和服务器
+        function saveToLocalStorage() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(boardData));
+            // 向服务器同步
+            fetch(getApiUrl("/api/save"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(boardData)
+            }).catch(err => console.error("Failed to save to server:", err));
+        }
+
+        // 一键复制整个看板文本为易读形式
+        function copyBoardText() {
+            let text = "📋 欢乐牧场挂菜价格看板\n";
+            let hasContent = false;
+
+            for (const key in cropConfigs) {
+                const config = cropConfigs[key];
+                const list = boardData[key] || [];
+
+                const validList = list.filter(item => item.id.trim() !== "" && item.price > 0);
+
+                if (validList.length > 0) {
+                    hasContent = true;
+                    const sortedList = [...validList].sort((a, b) => {
+                         const aOnline = a.hasOwnProperty("online") ? a.online : true;
+                         const bOnline = b.hasOwnProperty("online") ? b.online : true;
+                         if (aOnline !== bOnline) {
+                             return aOnline ? -1 : 1;
+                         }
+                         return b.price - a.price;
+                     });
+
+                    text += `${config.name} (上限 ${config.range.split(" - ")[1]}):\n`;
+                    sortedList.forEach((item, idx) => {
+                        const isOnline = item.hasOwnProperty("online") ? item.online : true;
+                        const statusText = isOnline ? " (在线)" : " (下线)";
+                        text += `  🥇 ${idx + 1}. [${item.id}] 价格: ${item.price}${statusText}\n`;
+                    });
+                }
+            }
+
+            if (!hasContent) {
+                showToast("看板中没有任何有效数据可供复制哦~");
+                return;
+            }
+
+            copyTextToClipboard(text).then(() => {
+                showToast("复制成功！快发去群里或评论区吧");
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+                prompt("复制失败，请手动全选复制以下文本：", text);
+            });
+        }
+
+        // 统一剪贴板写入兼容性接口
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            } else {
+                // 降级使用 textarea 复制
+                return new Promise((resolve, reject) => {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand("copy");
+                        document.body.removeChild(textArea);
+                        if (successful) resolve();
+                        else reject(new Error("textarea copy command failed"));
+                    } catch (err) {
+                        document.body.removeChild(textArea);
+                        reject(err);
+                    }
+                });
+            }
+        }
+
+        // 复制微信号并展示 Toast 提示
+        function copyWeChatId(wechatId) {
+            copyTextToClipboard(wechatId).then(() => {
+                showToast("已复制微信号: " + wechatId + "，快去微信添加好友吧！");
+            }).catch(err => {
+                console.error("Failed to copy WeChat ID: ", err);
+                showToast("复制失败，请手动记录微信号：" + wechatId);
+            });
+        }
+
+        // 切换在线状态
+        function toggleOnline(cropKey, index) {
+            lastEditTime = Date.now(); // 阻止拉取冲突
+            if (!boardData[cropKey] || !boardData[cropKey][index]) return;
+            const currentStatus = boardData[cropKey][index].hasOwnProperty("online") ? boardData[cropKey][index].online : true;
+            boardData[cropKey][index].online = !currentStatus;
+            saveToLocalStorage();
+            renderAllCards();
+        }
+
+        // 打开自定义清空确认弹窗
+        function clearAllData() {
+            const modal = document.getElementById("confirm-modal");
+            modal.style.display = "flex";
+            setTimeout(() => {
+                modal.classList.add("show");
+            }, 10);
+        }
+
+        // 关闭自定义清空确认弹窗
+        function closeConfirmModal() {
+            const modal = document.getElementById("confirm-modal");
+            modal.classList.remove("show");
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 200);
+        }
+
+        // 执行清空所有数据
+        function executeClearAll() {
+            for (const cropKey in boardData) {
+                boardData[cropKey] = [];
+            }
+            saveToLocalStorage();
+            renderAllCards();
+            closeConfirmModal();
+            showToast("已清空所有价格数据！");
+        }
+
+        // 显示提示浮点
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+    </script>
+</body>
+
+</html>
