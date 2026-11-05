@@ -487,8 +487,11 @@ export default function App() {
   return (
     <>
       <header>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <h1 style={{ margin: 0 }}>🎮 欢乐牧场价格看板</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <h1 style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+            <img className="market-brand-logo" src={`${import.meta.env.BASE_URL}brand/cai-mark.svg`} alt="" width="44" height="44" />
+            欢乐牧场价格看板
+          </h1>
           <span style={{ fontSize: '0.68rem', color: '#f1f5f9', opacity: 0.85, fontWeight: 400, letterSpacing: '0.5px' }}>
             http://happyranch.guaguahub.cn
           </span>

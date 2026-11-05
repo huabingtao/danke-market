@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>高价卖菜 · 菜字徽章</title>
+  <defs>
+    <linearGradient id="amber" x1="10" y1="5" x2="53" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD278"/><stop offset=".53" stop-color="#FF9F27"/><stop offset="1" stop-color="#F46A13"/></linearGradient>
+    <clipPath id="disc"><circle cx="32" cy="32" r="29.5"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="#0B1220"/>
+  <circle cx="32" cy="32" r="29.5" fill="url(#amber)"/>
+  <g clip-path="url(#disc)" stroke="#763411" opacity=".16" stroke-width="1.3"><path d="M8 58Q20 26 55 8M14 46Q14 29 25 20M22 34Q35 35 47 24M30 25Q29 14 37 7M10 54Q27 55 41 42"/></g>
+  <circle cx="32" cy="32" r="26" stroke="#FFF2CE" stroke-opacity=".5"/>
+  <!-- Outlined glyph: no client font dependency. -->
+  <path d="M551 15Q551 -54 554 -123Q517 -119 480 -123Q483 -54 483 15V160Q403 63 295.0 -8.5Q187 -80 58 -105Q55 -62 29 -30Q105 -17 187.5 14.5Q270 46 331 103Q367 136 414 193H148Q100 193 51 191Q54 217 51 243Q100 241 148 241H482Q481 277 480 314Q513 310 546 313Q473 383 386 432L422 497Q518 443 598 366L547 313Q551 313 554 314Q552 277 552 241H879Q927 241 975 243Q973 217 975 191Q927 193 879 193H617Q693 87 778.0 39.0Q863 -9 972 -19Q943 -48 940 -88Q876 -80 814.5 -52.5Q753 -25 704 15Q613 88 551 182ZM828 504Q852 475 882 453Q804 369 685 274Q667 305 634 319Q726 394 828 504ZM303 271Q225 336 139 390L178 454Q269 397 351 328ZM632 688H354Q355 644 357 600Q320 604 282 600Q285 648 286 688H143Q95 688 47 686Q49 712 47 738Q95 736 143 736H286Q285 789 282 841Q320 837 357 841L354 736H632Q631 789 629 841Q666 837 703 841Q701 789 700 736H871Q920 736 968 738Q965 712 968 686Q920 688 871 688H700V587L816 604Q815 565 822 526Q533 515 166 482L130 549L212 547Q247 547 299.5 549.0Q352 551 439.0 558.5Q526 566 632 579Z" transform="translate(11.6909 46.5239) scale(0.040456 -0.040456)" fill="#142033" stroke="#142033" stroke-width="12" stroke-linejoin="round"/>
+  <path d="m50 9 1.2 3.2 3.3 1.1-3.3 1.2-1.2 3.2-1.1-3.2-3.3-1.2 3.3-1.1Z" fill="#FFF4D7"/>
+</svg>

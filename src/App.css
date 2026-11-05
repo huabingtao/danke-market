@@ -1037,3 +1037,14 @@ button:disabled {
 .btn-share-website:active {
     transform: scale(0.96);
 }
+
+.market-brand-logo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 50%;
+}
+@media (max-width: 640px) {
+  .market-brand-logo { width: 36px; height: 36px; }
+}
