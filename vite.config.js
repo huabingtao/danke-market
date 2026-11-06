@@ -88,7 +88,10 @@ function syncApiPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), syncApiPlugin()],
+  preview: { port: Number(process.env.PORT || 6112), strictPort: true },
   server: {
-    host: true
+    host: true,
+    port: Number(process.env.PORT || 6105),
+    strictPort: true
   }
 })

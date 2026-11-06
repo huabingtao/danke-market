@@ -405,7 +405,7 @@ app.get('*', (req, res) => {
 });
 
 // Start listening
-const PORT = config.port || 8080;
+const PORT = Number(process.env.PORT || (process.env.NODE_ENV === "production" ? (config.port || 8080) : 6106));
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`===============================================`);
   console.log(`  欢乐牧场看板已启动：http://localhost:${PORT}`);
